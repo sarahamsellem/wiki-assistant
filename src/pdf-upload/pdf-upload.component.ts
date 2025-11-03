@@ -1,9 +1,13 @@
 import {Component, inject, signal} from '@angular/core';
 import {HttpService} from '../services/http.service';
+import {NgIf} from '@angular/common';
 
 @Component({
   selector: 'app-pdf-upload',
   templateUrl: './pdf-upload.component.html',
+  imports: [
+    NgIf
+  ],
   standalone: true
 })
 export class PdfUploadComponent {
@@ -45,4 +49,6 @@ export class PdfUploadComponent {
       },
     });
   }
+
+  protected readonly navigator = navigator;
 }

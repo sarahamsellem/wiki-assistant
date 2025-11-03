@@ -1,37 +1,63 @@
-<div class="max-w-xl mx-auto p-6 bg-white shadow rounded">
-  <h2 class="text-2xl font-bold mb-4">Upload FSD PDF</h2>
+<div class="min-h-screen bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center p-6">
+  <div class="w-full max-w-2xl bg-white/80 backdrop-blur-md rounded-2xl shadow-xl p-8 border border-slate-200">
 
-  <input
-    type="file"
-    accept=".pdf"
-    (change)="onFileSelected($event)"
-    class="block mb-4"
-  />
+    <h2 class="text-3xl font-semibold text-slate-800 mb-6 text-center">
+      📄 Upload FSD PDF
+    </h2>
 
-  <button
-    (click)="uploadPdf()"
-    [disabled]="!selectedFile"
-    class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 disabled:bg-gray-400"
-  >
-    Upload & Parse
-  </button>
+    <!-- File Input -->
+    <div
+      class="border-2 border-dashed border-slate-300 rounded-xl p-8 text-center hover:border-blue-400 transition-colors mb-6 cursor-pointer"
+      (click)="fileInput.click()"
+    >
+      <input
+        type="file"
+        accept=".pdf"
+        #fileInput
+        (change)="onFileSelected($event)"
+        class="hidden"
+      />
+      <div class="text-slate-600">
+        <span *ngIf="!selectedFile()" class="text-base">
+          Drag & drop your PDF here or <span class="text-blue-600 font-medium">browse</span>
+        </span>
+        <span *ngIf="selectedFile()" class="font-medium text-blue-700">
+          {{ selectedFile()?.name }}
+        </span>
+      </div>
+    </div>
 
-  <div *ngIf="pdfText" class="mt-6">
-    <h3 class="text-xl font-semibold mb-2">Extracted Text</h3>
-    <textarea
-      rows="10"
-      class="w-full border rounded p-2"
-      [value]="pdfText"
-      readonly
-    ></textarea>
-  </div>
+    <!-- Upload Button -->
+    <div class="flex justify-center">
+      <button
+        (click)="uploadPdf()"
+        [disabled]="!selectedFile"
+        class="px-6 py-2.5 bg-blue-600 text-white rounded-lg font-medium
+               shadow-md hover:bg-blue-700 disabled:bg-gray-400
+               transition-all duration-200"
+      >
+        Upload & Parse
+      </button>
+    </div>
 
-  <div *ngIf="tasks.length" class="mt-6">
-    <h3 class="text-xl font-semibold mb-2">Extracted Tasks</h3>
-    <ul class="list-disc list-inside">
-      <li *ngFor="let task of tasks">
-        <b>{{ task.title }}</b>: {{ task.description }}
-      </li>
-    </ul>
+    <!-- Extracted Text -->
+    <div *ngIf="pdfText()" class="mt-8">
+      <h3 class="text-xl font-semibold text-slate-800 mb-3">Extracted Text</h3>
+      <div class="relative">
+        <textarea
+          rows="12"
+          class="w-full border border-slate-300 rounded-xl p-4 text-slate-700 bg-slate-50 focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none shadow-inner"
+          [value]="pdfText()"
+          readonly
+        ></textarea>
+        <button
+          type="button"
+          class="absolute top-3 right-3 text-sm text-blue-600 hover:text-blue-800"
+          (click)="navigator.clipboard.writeText(pdfText())"
+        >
+          Copy
+        </button>
+      </div>
+    </div>
   </div>
 </div>

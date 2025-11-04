@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
+import {Task} from '../pdf-upload/pdf-upload.component';
 
 @Injectable({
   providedIn: 'root'
@@ -21,6 +22,10 @@ export class HttpService {
     formData.append('file', file);
 
     return this.http.post(`${this.baseUrl}/upload-pdf`, formData);
+  }
+
+  createJiraTasks(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/create-jira`);
   }
 
   /**

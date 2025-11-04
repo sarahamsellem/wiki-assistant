@@ -1,4 +1,4 @@
-<div class="min-h-screen bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center p-6">
+<div class="min-h-screen bg-gradient-to-br from-slate-100 to-slate-200 flex flex-col items-center justify-center p-6">
   <div class="w-full max-w-2xl bg-white/80 backdrop-blur-md rounded-2xl shadow-xl p-8 border border-slate-200">
 
     <h2 class="text-3xl font-semibold text-slate-800 mb-6 text-center">
@@ -32,32 +32,119 @@
       <button
         (click)="uploadPdf()"
         [disabled]="!selectedFile"
+        *ngIf="!loading()"
         class="px-6 py-2.5 bg-blue-600 text-white rounded-lg font-medium
                shadow-md hover:bg-blue-700 disabled:bg-gray-400
                transition-all duration-200"
       >
         Upload & Parse
       </button>
+      <!-- Loader (shown when loading) -->
+      <div *ngIf="loading()" class="flex items-center space-x-2">
+        <div
+          class="w-6 h-6 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"
+        ></div>
+        <span class="text-blue-600 font-medium">Processing...</span>
+      </div>
     </div>
 
     <!-- Extracted Text -->
-    <div *ngIf="pdfText()" class="mt-8">
-      <h3 class="text-xl font-semibold text-slate-800 mb-3">Extracted Text</h3>
-      <div class="relative">
-        <textarea
-          rows="12"
-          class="w-full border border-slate-300 rounded-xl p-4 text-slate-700 bg-slate-50 focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none shadow-inner"
-          [value]="pdfText()"
-          readonly
-        ></textarea>
-        <button
-          type="button"
-          class="absolute top-3 right-3 text-sm text-blue-600 hover:text-blue-800"
-          (click)="navigator.clipboard.writeText(pdfText())"
-        >
-          Copy
-        </button>
+<!--    <div *ngIf="pdfText()" class="mt-8">-->
+<!--      <h3 class="text-xl font-semibold text-slate-800 mb-3">Extracted Text</h3>-->
+<!--      <div class="relative">-->
+<!--        <textarea-->
+<!--          rows="12"-->
+<!--          class="w-full border border-slate-300 rounded-xl p-4 text-slate-700 bg-slate-50 focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none shadow-inner"-->
+<!--          [value]="pdfText()"-->
+<!--          readonly-->
+<!--        ></textarea>-->
+<!--        <button-->
+<!--          type="button"-->
+<!--          class="absolute top-3 right-3 text-sm text-blue-600 hover:text-blue-800"-->
+<!--          (click)="navigator.clipboard.writeText(pdfText())"-->
+<!--        >-->
+<!--          Copy-->
+<!--        </button>-->
+<!--      </div>-->
+<!--    </div>-->
+  </div>
+
+  <!-- Parsed Completion Output -->
+<!--  <div class="w-full max-w-full mt-10 bg-white/80 backdrop-blur-md rounded-2xl shadow-lg p-6 border border-slate-200">-->
+<!--    <h3 class="text-xl font-semibold text-slate-800 mb-4 text-center">-->
+<!--      Parsed Completion-->
+<!--    </h3>-->
+
+<!--    <div class="overflow-x-auto">-->
+<!--      <pre class="bg-gray-100 p-4 rounded-lg text-sm text-slate-800 whitespace-pre-wrap break-words shadow-inner border border-slate-200">-->
+<!--  {{ result() | json }}-->
+<!--      </pre>-->
+<!--    </div>-->
+<!--  </div>-->
+  <!-- Parsed Completion Output -->
+  <div
+    *ngIf="result()"
+    class="w-full max-w-3xl mt-10 bg-white/80 backdrop-blur-md rounded-2xl shadow-lg p-6 border border-slate-200"
+  >
+    <h3 class="text-2xl font-semibold text-slate-800 mb-6 text-center">
+      {{ result()?.topic }}
+    </h3>
+
+    <!-- Task List -->
+    <div class="space-y-5">
+      <div
+        *ngFor="let task of result()?.tasks"
+        class="p-5 border border-slate-300 rounded-xl bg-slate-50 shadow-sm hover:shadow-md transition"
+      >
+        <div class="flex justify-between items-start mb-2">
+          <h4 class="text-lg font-semibold text-blue-700">
+            {{ task.summary }}
+          </h4>
+
+          <label class="flex items-center gap-2 select-none cursor-pointer">
+            <input
+              type="checkbox"
+              class="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+              [checked]="selected().has(task)"
+              (change)="toggleSelection(task)"
+            />
+            <span class="text-sm text-gray-700">Add to Jira</span>
+          </label>
+        </div>
+
+        <p class="text-sm text-gray-700 mb-2">
+          <span class="font-medium">Issue Type:</span> {{ task.issue_type }}
+        </p>
+        <p class="text-sm text-gray-700 mb-2">
+          <span class="font-medium">Description:</span> {{ task.description }}
+        </p>
+
+        <div class="grid grid-cols-2 gap-2 mt-3 text-sm text-gray-700">
+          <p><span class="font-medium">Platform Product:</span> {{ task.custom_field_platform_product }}</p>
+          <p><span class="font-medium">Fix Version/s:</span> {{ task.fix_version }}</p>
+          <p><span class="font-medium">Assignee:</span> {{ task.assignee }}</p>
+          <p><span class="font-medium">Reporter:</span> {{ task.reporter }}</p>
+          <p class="col-span-2">
+            <span class="font-medium">Baseline Estimate:</span>
+            {{ task.custom_field_baseline_estimate }}
+          </p>
+        </div>
       </div>
     </div>
+
+    <!-- Create Jira Tasks -->
+    <div class="mt-8 text-center">
+      <button
+        (click)="createJiraTasks()"
+        [disabled]="selectedCount() === 0"
+        class="px-6 py-2 bg-blue-600 text-white rounded-lg font-medium
+             shadow-md hover:bg-blue-700 disabled:bg-gray-400
+             transition-all duration-200"
+      >
+        Create {{ selectedCount() }} Jira Task{{ selectedCount() === 1 ? '' : 's' }}
+      </button>
+    </div>
   </div>
+
+
 </div>
